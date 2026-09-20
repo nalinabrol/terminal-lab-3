@@ -41,7 +41,7 @@ work/ | Your saved measurements, observations and working copies.
 
 **How to work:** predict, run, inspect, explain. Start each section at your lab root. Use familiar terminal commands and nano; no solution scripts are needed. Save only inside work/.
 
-Reusing an ID preserves every existing file; it does not reset an attempt. Save in nano with Ctrl+O, Enter, then exit with Ctrl+X. Use Control on a Mac too. Keep this Codespace for review; ignored lab-work/ is not a GitHub backup.
+Reusing an ID preserves every existing file; it does not reset an attempt. Save in nano with Ctrl+O, Enter, then exit with Ctrl+X. If the browser intercepts Ctrl+X, use F2 to exit nano. Use Control on a Mac too. Keep this Codespace for review; ignored lab-work/ is not a GitHub backup.
 
 
 ---
@@ -172,7 +172,7 @@ du -sh . displays this size for my lab folder: __________________
 
 df -h . displays this filesystem Size: ________ and Avail: ________
 
-Both commands use . . Why do they answer different questions?
+Both commands use the dot. Why do they answer different questions?
 
 _________________________________________________________________
 
@@ -342,7 +342,7 @@ cat work/report.txt | Read a saved text report.
 COMMAND > work/report.txt | Save command output; replace that destination file.
 cp SOURCE DESTINATION | Copy to the named destination; can overwrite a file.
 nano work/observations.txt | Edit the observation lines. Keep their key names.
-Ctrl+O, Enter / Ctrl+X | In nano: save and confirm filename / exit.
+Ctrl+O, Enter / Ctrl+X or F2 | In nano: save and confirm filename / exit.
 
 ## Hints without the answers
 
