@@ -37,8 +37,8 @@ with tempfile.TemporaryDirectory(prefix='terminal-lab-extension-') as directory:
         archive.writestr('[Content_Types].xml', content_types)
         for name in ('package.json', 'extension.js'):
             archive.write(source / name, f'extension/{name}')
-    # During postCreate there is no connected editor / remote-cli IPC socket.
-    # Use the installed server CLI directly, before the extension host starts.
+    # Run after editor attachment: fresh Codespaces may provision the VS Code
+    # server only after postCreate has completed. Use the installed server CLI.
     candidates = list(Path('/vscode/bin').glob('*/*/bin/code-server'))
     candidates += list((Path.home() / '.vscode-remote/bin').glob('*/bin/code-server'))
     candidates += list((Path.home() / '.vscode-server/bin').glob('*/bin/code-server'))

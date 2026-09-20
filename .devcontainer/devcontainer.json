@@ -37,5 +37,6 @@
       ]
     }
   },
-  "postCreateCommand": "bash scripts/verify_environment.sh && python3 scripts/install_terminal_startup.py"
+  "postCreateCommand": "bash scripts/verify_environment.sh",
+  "postAttachCommand": "python3 scripts/install_terminal_startup.py"
 }
