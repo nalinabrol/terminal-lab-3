@@ -27,7 +27,7 @@ def extend(root, check, read, expected):
     def uptime():
         match=re.search(r' up (.+?),\s*\d+ users?,\s*load average[s]?:\s*([\d.]+),\s*([\d.]+),\s*([\d.]+)',read('work/uptime.txt'))
         if not match: raise ValueError('Keep full uptime output')
-        return match.groups()
+        return tuple(value.strip() for value in match.groups())
     def uptime_map():
         return all(values('work/system.txt')[k]==v for k,v in zip(['uptime_elapsed','load_1','load_5','load_15'],uptime()))
     def record(): return json.loads(read('work/process.json'))

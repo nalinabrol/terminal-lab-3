@@ -15,6 +15,7 @@ def solve(root, command, capture):
     up=capture(root,'work/uptime.txt','uptime')
     fields=re.search(r' up (.+?),\s*\d+ users?,\s*load average[s]?:\s*([\d.]+),\s*([\d.]+),\s*([\d.]+)',up).groups()
     values={'memory_total':m['total'],'memory_available':m['available'],'swap_total':sw[0]}
+    fields=tuple(value.strip() for value in fields)
     values.update(zip(['uptime_elapsed','load_1','load_5','load_15'],fields))
     (root/'work/system.txt').write_text(''.join(f'{k}={v}\n' for k,v in values.items()))
     command(root,sys.executable,helper,'start')
@@ -73,6 +74,17 @@ def wrong_cases(root, evaluate):
         p=root/'work'/name;good=p.read_bytes();p.write_bytes(b'wrong\n')
         try: assert not evaluate(root)[index][0],(index,name)
         finally:p.write_bytes(good)
+    # uptime pads single-digit hours; student values need not copy layout spaces.
+    p=root/'work/uptime.txt';good=p.read_bytes()
+    v=root/'work/system.txt';original=v.read_bytes()
+    p.write_text(' 12:00:00 up  5:55,  0 user,  load average: 2.55, 2.73, 1.23\n')
+    v.write_text(re.sub(r'uptime_elapsed=.*', 'uptime_elapsed=5:55', v.read_text()))
+    text=v.read_text()
+    for k,value in [('load_1','2.55'),('load_5','2.73'),('load_15','1.23')]:
+        text=re.sub(k+r'=.*', k+'='+value, text)
+    v.write_text(text)
+    assert evaluate(root)[12][0], 'Padded uptime rejected'
+    p.write_bytes(good);v.write_bytes(original)
     # Correct archive type matters, not extension. Reject valid ZIP with missing nested file.
     import zipfile
     p=root/'work/dispatch.zip';good=p.read_bytes()
