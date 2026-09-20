@@ -50,7 +50,7 @@ def evaluate(root):
     def check(label, predicate, hint):
         try:
             ok = bool(predicate())
-        except (OSError, ValueError, KeyError, IndexError, subprocess.SubprocessError):
+        except (OSError, ValueError, KeyError, IndexError, StopIteration, subprocess.SubprocessError):
             ok = False
         results.append((ok, label, hint))
     def read(name):
@@ -63,7 +63,7 @@ def evaluate(root):
         lab_id = ident['LAB_ID']
         if not valid_id(lab_id):
             raise ValueError('Invalid lab ID')
-        expected = originals(lab_id)
+        expected = originals(lab_id, ident['DATA_VERSION'])
     except (OSError, ValueError, KeyError):
         return [(False, 'Lab identity', 'Run from your lab root; ask for help if identity.txt changed.')]
     def preserved():
@@ -102,6 +102,9 @@ def evaluate(root):
     check('Copy before and after evidence',copy_growth,'Measure the empty target before copying and again afterwards; do not replace the before snapshot on a rerun.')
     check('Three independent folder measurements',lambda: measured('work/challenge-usage.txt',CHALLENGE),'Measure each challenge folder and save the three output lines.')
     check('Largest independent folder',lambda: obs()['challenge_largest'] == 'interviews','Use your challenge report to select a folder; enter only its name.')
+    if ident['DATA_VERSION'] == 'book3-v2':
+        from checks_extra import extend
+        extend(root, check, read, expected)
     return results
 
 def main():

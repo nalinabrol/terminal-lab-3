@@ -1,9 +1,9 @@
-name: Validate Experiment 1
+name: Validate Experiment Book 3
 on: [push, workflow_dispatch]
 jobs:
-  experiment-1:
+  book-3:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get update && sudo apt-get install -y nano
+      - run: sudo apt-get update && sudo apt-get install -y nano procps zip unzip tar
       - run: bash scripts/verify_environment.sh

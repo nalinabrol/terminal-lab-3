@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / 'terminal-lab-3'))
 import setup
 import check
+import verify_extra
 
 ENV = dict(os.environ, LC_ALL='C')
 
@@ -58,6 +59,7 @@ def solve(root):
     lines=['guided_largest=recordings']+[f'{k}={v}' for k,v in zip(keys,row[1:])]+['challenge_largest=interviews']
     (root/'work/observations.txt').write_text('\n'.join(lines)+'\n')
     command(root,'cat','work/observations.txt')
+    verify_extra.solve(root,command,capture)
 
 def main():
     if sys.platform != 'linux':
@@ -66,14 +68,14 @@ def main():
         with tempfile.TemporaryDirectory(prefix='book3-verify-') as d:
             root=setup.create(lab_id,Path(d)/('lab3-'+lab_id))
             initial=check.evaluate(root)
-            assert len(initial)==9 and sum(ok for ok,_,_ in initial)==1, initial
+            assert len(initial)==35 and sum(ok for ok,_,_ in initial)==1, initial
             for relative in setup.PAYLOADS:
                 p=root/relative
                 assert p.stat().st_blocks*512 >= p.stat().st_size, 'Sparse payload'
                 assert len(zlib.compress(p.read_bytes())) > p.stat().st_size*.99, 'Compressible payload'
             solve(root)
             results=check.evaluate(root)
-            assert len(results)==9 and all(ok for ok,_,_ in results), results
+            assert len(results)==35 and all(ok for ok,_,_ in results), results
             before=snapshot(root)
             subprocess.run([sys.executable,str(ROOT/'terminal-lab-3/check.py')],cwd=root,check=True,stdout=subprocess.DEVNULL)
             assert snapshot(root)==before, 'Checker changed files'
@@ -93,6 +95,7 @@ def main():
                 p=root/name; good=p.read_bytes();p.write_bytes(bad)
                 assert not check.evaluate(root)[index][0], (name,index)
                 p.write_bytes(good)
+            verify_extra.wrong_cases(root,check.evaluate)
             p=root/'work/guided-usage.txt';good=p.read_bytes();p.unlink()
             assert not check.evaluate(root)[1][0], 'Missing report accepted'
             p.write_bytes(good)
@@ -112,10 +115,16 @@ def main():
                 raise AssertionError('Existing attempt overwritten')
             assert snapshot(root)==before, 'Repeat setup changed an attempt'
             assert all(ok for ok,_,_ in check.evaluate(root))
-            print(f'PASS {lab_id}: 9/9, nine targeted failures, missing/extra/link cases, read-only check, rerun preservation, payload allocation/compression')
+            print(f'PASS {lab_id}: 35/35, 35 targeted failures, missing/extra/link cases, read-only check, rerun preservation, payload allocation/compression')
+    with tempfile.TemporaryDirectory(prefix='book3-legacy-') as d:
+        root=Path(d)
+        for name,data in setup.originals('REVIEW-E1',setup.LEGACY_VERSION).items():
+            p=root/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(data)
+        assert len(check.evaluate(root))==9,'Legacy checker scope changed'
+    print('PASS legacy identity retains nine-check scope')
     for value in ['', '../escape','/tmp/escape','a b','-bad','a'*25]:
         assert not setup.valid_id(value), value
-    print('PASS invalid IDs rejected; all stage-1 runtime checks passed.')
+    print('PASS invalid IDs rejected; all seven-experiment runtime checks passed.')
 
 if __name__=='__main__':
     main()
