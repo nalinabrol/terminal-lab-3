@@ -1,0 +1,9 @@
+name: Validate Experiment 1
+on: [push, workflow_dispatch]
+jobs:
+  experiment-1:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y nano
+      - run: bash scripts/verify_environment.sh
